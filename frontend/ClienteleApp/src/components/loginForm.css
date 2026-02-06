@@ -1,0 +1,49 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.loginForm {
+  width: 320px;
+  margin: 80px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: sans-serif;
+}
+
+.loginForm input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.primary {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #4a6cff;
+  color: white;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background: #3b55cc;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #4a6cff;
+  cursor: pointer;
+  font-size: 13px;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}

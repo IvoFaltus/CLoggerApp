@@ -1,9 +1,17 @@
+
+import Login from "./components/login";
+import Register from "./components/register";
 import { useState } from "react";
 
-function App() {
-  
 
-  return <h1>Hello Clientele App</h1>
+function App() {
+  const[page,setPage] = useState("login")
+
+  return <>
+    {page === "login" && <Login setPage={setPage} />}
+    {page ==="register" && <Register setPage={setPage}/>}
+    
+  </>
 }
 
 export default App;
