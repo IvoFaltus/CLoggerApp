@@ -9,8 +9,8 @@ def get_db():
         host=DB["host"],
         port=DB["port"],
         database=DB["database"],
-        user=DB["user"],
-        password=DB["password"]
+        user=DB["root"],
+        password=DB["aa"]
     )
 
 

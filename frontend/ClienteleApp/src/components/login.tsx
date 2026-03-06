@@ -5,7 +5,7 @@ const Login = (props:any) => {
 
     
 
-    return <LoginForm setPage={props.setPage}/>
+    return <LoginForm />
 }
 
 export default Login
