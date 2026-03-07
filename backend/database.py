@@ -1,95 +1,108 @@
 import json
 import mysql.connector
+from mysql.connector.pooling import MySQLConnectionPool
 
 with open("config.json") as f:
     DB = json.load(f)
 
+def get_tables():
+    result = None
+    with open("tables.json") as f:
+        result = json.load(f)
+        result = result["tables"]
+    return result    
+
+
+def get_attrs():
+    result = None
+    with open("attributes.json") as f:
+        result = json.load(f)
+    return result   
+
+
+tables = get_tables()
+attrs = get_attrs()
+
+pool = MySQLConnectionPool(
+    pool_name="client_pool",
+    pool_size=10,
+    host=DB["host"],
+    port=DB["port"],
+    database=DB["database"],
+    user=DB["user"],
+    password=DB["password"]
+)
+
 def get_db():
-    return mysql.connector.connect(
-        host=DB["host"],
-        port=DB["port"],
-        database=DB["database"],
-        user=DB["root"],
-        password=DB["aa"]
-    )
+    return pool.get_connection()
+
+
+def insert(table, values):
+
+    if table not in tables or table not in attrs:
+        return None
+
+    if not values:
+        return None
+
+    for key in values.keys():
+        if key not in attrs[table]:
+            return None
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    try:
+        keys = ",".join(values.keys())
+        parameters = ["%s" for s in range(len(values))]
+        data = tuple(values[key] for key in values.keys())
+        parameters = ",".join(parameters)
+
+        cursor.execute(f"INSERT INTO {table}({keys}) VALUES({parameters})", data)
+        conn.commit()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def select(table, columns, condition=None):
+
+    if table not in tables or table not in attrs:
+        return None
+
+    if not columns:
+        return None
+
+    for key in columns:
+        if key not in attrs[table]:
+            return None
+
+    if condition is not None:
+        for key in condition.keys():
+            if key not in attrs[table]:
+                return None
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    try:
+        cols = ",".join(columns)
+
+        if condition is None:
+            cursor.execute(f"SELECT {cols} FROM {table};")
+        else:
+            string = " AND ".join(f"{key}=%s" for key in condition.keys())
+            parameters = tuple(condition[key] for key in condition.keys())
+            cursor.execute(f"SELECT {cols} FROM {table} WHERE {string};", parameters)
+
+        result = cursor.fetchall()
+        return result
+
+    finally:
+        cursor.close()
+        conn.close()
 
 
 if __name__ == "__main__":
-    conn = get_db()
-    print("Database connection successful:", conn.is_connected())
-
-    cursor = conn.cursor()
-    cursor.execute("select * from users;")
-    tables = cursor.fetchall()
-    print("Tables in the database:", tables)
-    cursor.close()
-
-    conn.close()
-
-   
-    # CREATE TABLE users (
-    #     id INT AUTO_INCREMENT PRIMARY KEY,
-    #     username VARCHAR(40) NOT NULL,
-    #     password VARCHAR(255) NOT NULL
-        
-    # );
-    # CREATE TABLE country(
-    # id INT AUTO_INCREMENT PRIMARY KEY,
-    # name varchar(30) not null
-
-    # );
-
-    # CREATE TABLE clients (
-    #     id INT AUTO_INCREMENT PRIMARY KEY,
-    #     name VARCHAR(20) NOT NULL,
-    #     surname VARCHAR(30) NOT NULL,
-    #     phone varchar(30) not null,
-    #     email VARCHAR(50) CHECK (email LIKE '%@%.%') not null,
-    #     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    #     active BOOLEAN DEFAULT TRUE,
-    #     updated_at DATETIME 
-    #         DEFAULT CURRENT_TIMESTAMP 
-    #         ON UPDATE CURRENT_TIMESTAMP,
-    #     vip BOOLEAN default false,
-    #     country_id INT,
-    # FOREIGN KEY (country_id) REFERENCES country(id)
-
-    # );
-
-    #     CREATE TABLE user_client (
-    #     id INT AUTO_INCREMENT PRIMARY KEY,
-    #     user_id INT NOT NULL,
-    #     client_id INT NOT NULL,
-    #     role VARCHAR(30),
-    #     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    #     FOREIGN KEY (user_id) REFERENCES users(id),
-    #     FOREIGN KEY (client_id) REFERENCES clients(id),
-    #     UNIQUE (user_id, client_id)
-    # );
-    # CREATE TABLE payment (
-    #     id INT AUTO_INCREMENT PRIMARY KEY,
-    #     user_client_id INT NOT NULL,
-    #     amount FLOAT NOT NULL,
-    #     paid BOOLEAN DEFAULT FALSE,
-    #     paid_at DATETIME,
-
-    #     FOREIGN KEY (user_client_id) REFERENCES user_client(id)
-    # );
-    # CREATE TABLE note (
-    #     id INT AUTO_INCREMENT PRIMARY KEY,
-    #     user_id INT NOT NULL,
-    #     client_id INT NOT NULL,
-    #     text VARCHAR(255) NOT NULL,
-    #     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    #     FOREIGN KEY (user_id) REFERENCES users(id),
-    #     FOREIGN KEY (client_id) REFERENCES clients(id)
-    # );
-
-
-
-
-
-
-
+    #insert("users",{"name":"jozef","lastname":"adsad","passwd_hash":"jasdfasfdozef","username":"jozef123",})
+    print(select("users",["id","name","lastname"],{"id":"4"}))

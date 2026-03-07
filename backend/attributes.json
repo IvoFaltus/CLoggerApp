@@ -1,0 +1,45 @@
+{
+    "users": [
+        "id",
+        "name",
+        "lastname",
+        "passwd_hash",
+        "username"
+    ],
+    "client": [
+        "id",
+        "name",
+        "last_name"
+    ],
+    "session": [
+        "id",
+        "user_id",
+        "session_token",
+        "created_at",
+        "expires_at"
+    ],
+    "service": [
+        "id",
+        "user_id",
+        "client_id",
+        "service_title",
+        "date",
+        "service_description"
+    ],
+    "contract": [
+        "id",
+        "file_path",
+        "created_at",
+        "service_id"
+    ],
+    "payment": [
+        "id",
+        "amount",
+        "service_id"
+    ],
+    "note": [
+        "id",
+        "client_id",
+        "user_id"
+    ]
+}
