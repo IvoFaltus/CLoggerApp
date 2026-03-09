@@ -43,7 +43,7 @@ usersession = {
 
 @app.route("/home")
 def index():
-    session["user"] = 1   # <-- creates session
+    session["user"] = 1   
     return "ok"
 
 

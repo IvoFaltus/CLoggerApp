@@ -1,6 +1,27 @@
 import json
+import secrets
 import mysql.connector
 from mysql.connector.pooling import MySQLConnectionPool
+import secrets
+import time
+
+from datetime import datetime, timezone, timedelta
+
+from werkzeug.security import generate_password_hash
+
+import hashlib
+
+def hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def hash_password(password):
+    return generate_password_hash(password)
+
+
+
+
+
 
 with open("config.json") as f:
     DB = json.load(f)
@@ -18,7 +39,6 @@ def get_attrs():
     with open("attributes.json") as f:
         result = json.load(f)
     return result   
-
 
 tables = get_tables()
 attrs = get_attrs()
@@ -73,9 +93,10 @@ def select(table, columns, condition=None):
     if not columns:
         return None
 
-    for key in columns:
-        if key not in attrs[table]:
-            return None
+    if columns != "*":
+        for key in columns:
+            if key not in attrs[table]:
+                return None
 
     if condition is not None:
         for key in condition.keys():
@@ -86,7 +107,10 @@ def select(table, columns, condition=None):
     cursor = conn.cursor()
 
     try:
-        cols = ",".join(columns)
+        if columns == "*":
+            cols = "*"
+        else:
+            cols = ",".join(columns)
 
         if condition is None:
             cursor.execute(f"SELECT {cols} FROM {table};")
@@ -103,6 +127,20 @@ def select(table, columns, condition=None):
         conn.close()
 
 
+def login(user_id):
+    token = secrets.token_urlsafe(32)
+    starts=datetime.now(timezone.utc)
+    expires = datetime.now(timezone.utc) + timedelta(hours=24)
+    token_hash = hash_token(token)
+    insert("session",{"user_id":user_id,"session_token":token, "created_at": starts,"expires_at":expires})
+            
+            
+    
+    
+    
+    
 if __name__ == "__main__":
     #insert("users",{"name":"jozef","lastname":"adsad","passwd_hash":"jasdfasfdozef","username":"jozef123",})
-    print(select("users",["id","name","lastname"],{"id":"4"}))
+    #print(select("users",["id","name","lastname"],{"id":"4"}))
+    #login(1)
+    print(select("session","*"))
