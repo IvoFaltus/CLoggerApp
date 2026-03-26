@@ -2,3 +2,9 @@
 
     "tables": ["users","payment","client","session","service","contract","note","*"]
 }
+
+
+
+
+
+

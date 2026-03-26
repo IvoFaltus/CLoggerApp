@@ -1,7 +1,7 @@
 {
-  "host": "localhost",
-  "port": 3306,
-  "database": "clientapp",
-  "user": "root",
+  "host": "bestapi.cz",
+  "port": 5432,
+  "database": "test",
+  "user": "postgres",
   "password": "root"
 }

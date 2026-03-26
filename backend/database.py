@@ -1,8 +1,7 @@
 import json
 import secrets
-import mysql.connector
-from mysql.connector.pooling import MySQLConnectionPool
-import secrets
+import psycopg2
+from psycopg2 import pool
 import time
 
 from datetime import datetime, timezone, timedelta
@@ -10,6 +9,7 @@ from datetime import datetime, timezone, timedelta
 from werkzeug.security import generate_password_hash
 
 import hashlib
+
 
 def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
@@ -19,12 +19,9 @@ def hash_password(password):
     return generate_password_hash(password)
 
 
-
-
-
-
 with open("config.json") as f:
     DB = json.load(f)
+
 
 def get_tables():
     result = None
@@ -40,12 +37,13 @@ def get_attrs():
         result = json.load(f)
     return result   
 
+
 tables = get_tables()
 attrs = get_attrs()
 
-pool = MySQLConnectionPool(
-    pool_name="client_pool",
-    pool_size=10,
+
+pool = psycopg2.pool.SimpleConnectionPool(
+    1, 10,
     host=DB["host"],
     port=DB["port"],
     database=DB["database"],
@@ -53,8 +51,9 @@ pool = MySQLConnectionPool(
     password=DB["password"]
 )
 
+
 def get_db():
-    return pool.get_connection()
+    return pool.getconn()
 
 
 def insert(table, values):
@@ -74,7 +73,7 @@ def insert(table, values):
 
     try:
         keys = ",".join(values.keys())
-        parameters = ["%s" for s in range(len(values))]
+        parameters = ["%s" for _ in range(len(values))]
         data = tuple(values[key] for key in values.keys())
         parameters = ",".join(parameters)
 
@@ -82,7 +81,7 @@ def insert(table, values):
         conn.commit()
     finally:
         cursor.close()
-        conn.close()
+        pool.putconn(conn)
 
 
 def select(table, columns, condition=None):
@@ -124,23 +123,38 @@ def select(table, columns, condition=None):
 
     finally:
         cursor.close()
-        conn.close()
+        pool.putconn(conn)
+
+
+def query(query):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    result= cursor.fetchall()
+    cursor.close()
+    pool.putconn(conn)
+    return result
+
+
 
 
 def login(user_id):
     token = secrets.token_urlsafe(32)
-    starts=datetime.now(timezone.utc)
+    starts = datetime.now(timezone.utc)
     expires = datetime.now(timezone.utc) + timedelta(hours=24)
     token_hash = hash_token(token)
-    insert("session",{"user_id":user_id,"session_token":token, "created_at": starts,"expires_at":expires})
-            
-            
-    
-    
-    
-    
+
+    insert("session", {
+        "user_id": user_id,
+        "session_token": token,
+        "created_at": starts,
+        "expires_at": expires
+    })
+
+
 if __name__ == "__main__":
-    #insert("users",{"name":"jozef","lastname":"adsad","passwd_hash":"jasdfasfdozef","username":"jozef123",})
-    #print(select("users",["id","name","lastname"],{"id":"4"}))
-    #login(1)
-    print(select("session","*"))
+    # insert("users",{"name":"jozef","lastname":"adsad","passwd_hash":"jasdfasfdozef","username":"jozef123"})
+    # print(select("users",["id","name","lastname"],{"id":"4"}))
+    # login(1)
+    insert("users",{"name":"alex"})
+    print(select("users", "*"))
