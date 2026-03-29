@@ -1,9 +1,11 @@
-from flask import Flask, session
-from database import get_db
-
+from flask import Flask, session,request,jsonify
+from flask_cors import CORS
+from database import authenticate,login_user
+#from database import get_db
+import json
 app = Flask(__name__)
 app.secret_key = "i"
-
+CORS(app,supports_credentials=True)
 
 users = {
     "jozef":{
@@ -30,27 +32,29 @@ users = {
 }
 
 usersession = {
-    
-    
-    
-    
-    
 }
 
 
 
 
 
-@app.route("/home")
-def index():
-    session["user"] = 1   
-    return "ok"
-
-
-
-@app.route("/login", methods=["POST"])
+@app.post("/login_check")
 def login():
-    return "OK"
+    data = request.get_json()
+    username = data["username"]
+    password = data["password"]
+    if(authenticate(username,password)):
+        token=login_user(username)
+        response = jsonify({"token":token})
+        response.set_cookie("sessionid", token, httponly=True, samesite="Lax")
+        return response
+    else:
+        return jsonify({"msg":"error"})
+
+    
+
+
+
 
 
 if __name__ == "__main__":

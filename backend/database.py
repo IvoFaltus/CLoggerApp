@@ -6,9 +6,16 @@ import time
 
 from datetime import datetime, timezone, timedelta
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash,check_password_hash
 
 import hashlib
+
+
+
+def generate_session_token():
+    token = secrets.token_urlsafe(32)
+    print(token)
+    return token
 
 
 def hash_token(token: str) -> str:
@@ -138,23 +145,44 @@ def query(query):
 
 
 
-def login(user_id):
+def login_user(username):
+    user_id = select("users",["id"],{"username":username})[0][0]
     token = secrets.token_urlsafe(32)
     starts = datetime.now(timezone.utc)
     expires = datetime.now(timezone.utc) + timedelta(hours=24)
     token_hash = hash_token(token)
 
-    insert("session", {
+    insert("user_session", {
         "user_id": user_id,
         "session_token": token,
         "created_at": starts,
         "expires_at": expires
     })
+    return token
+
+def createUser(username,password):
+    hashed_passwd = hash_password(password)
+    select("users","passwd_hash",{"username":username})
+    
+
+
+
+
+def authenticate(username,passwd):
+    passwdhash = select("users", ["passwd_hash"],{"username":username})
+    if not passwdhash:
+        return None
+    passwdhash=passwdhash[0][0]
+    return check_password_hash(passwdhash,passwd)
+
+
+
 
 
 if __name__ == "__main__":
     # insert("users",{"name":"jozef","lastname":"adsad","passwd_hash":"jasdfasfdozef","username":"jozef123"})
     # print(select("users",["id","name","lastname"],{"id":"4"}))
     # login(1)
-    insert("users",{"name":"alex"})
-    print(select("users", "*"))
+    insert("users",{"name":"jozef","lastname":"lastname","passwd_hash":hash_password("heslo"),"username":"username231"})
+    # print(check_password_hash(select("users", ["passwd_hash"],{"username":"username231"})[0][0],"heslo"))
+    generate_session_token()
