@@ -1,0 +1,131 @@
+.dw {
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(79, 209, 255, 0.12), transparent 60%),
+    radial-gradient(800px 500px at 90% 0%, rgba(122, 162, 255, 0.12), transparent 55%),
+    linear-gradient(150deg, #05070f, #0a1022 60%, #0b1630);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  color: #d5e5ff;
+  padding: 32px 18px;
+}
+
+.dw__panel {
+  width: min(980px, 100%);
+  background: rgba(8, 14, 26, 0.92);
+  border: 1px solid rgba(79, 209, 255, 0.18);
+  padding: 32px;
+  box-shadow: 0 0 35px rgba(79, 209, 255, 0.16);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+}
+
+.dw__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(79, 209, 255, 0.2);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dw__title {
+  margin: 0;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.dw__sub {
+  font-size: 12px;
+  color: rgba(213, 229, 255, 0.6);
+}
+
+.dw__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  background: rgba(7, 13, 25, 0.8);
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 209, 255, 0.18);
+}
+
+.dw__dot {
+  width: 8px;
+  height: 8px;
+  background: #4fd1ff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(79, 209, 255, 0.9);
+}
+
+.dw__logout {
+  background: transparent;
+  border: 1px solid rgba(79, 209, 255, 0.8);
+  color: #4fd1ff;
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+}
+
+.dw__logout:hover {
+  background: #4fd1ff;
+  color: #050814;
+}
+
+.dw__content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+}
+
+.dw__card {
+  border: 1px solid rgba(79, 209, 255, 0.18);
+  padding: 18px;
+  background: linear-gradient(160deg, rgba(9, 16, 30, 0.9), rgba(8, 14, 26, 0.9));
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: transform 200ms ease, box-shadow 200ms ease, border 200ms ease;
+}
+
+.dw__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+  border-color: rgba(79, 209, 255, 0.45);
+}
+
+.dw__card h3 {
+  margin-top: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.dw__btn {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid rgba(79, 209, 255, 0.8);
+  color: #4fd1ff;
+  padding: 8px 12px;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.dw__btn:hover {
+  background: #4fd1ff;
+  color: #050814;
+  transform: translateY(-1px);
+}

@@ -11,7 +11,7 @@
         "name",
         "last_name"
     ],
-    "session": [
+    "user_session": [
         "id",
         "user_id",
         "session_token",
